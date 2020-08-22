@@ -20,22 +20,29 @@ struct EmojiArtDocumentView: View {
                             .font(Font.system(size: defaultEmojiSize)) //find the way to present as few symbols
                     }
                 }
-            }.padding(.horizontal)
+            }
+            .padding(.horizontal)
             
-            Color.yellow.overlay(Image(document.background))
+            Color.white.overlay(
+                Group{
+                    if document.background != nil {
+                        Image(uiImage: document.background!)
+                    }
+                }
+            )
                 .edgesIgnoringSafeArea([.bottom,.horizontal])
-                .onDrop(of: ["pablic.image"], isTargeted: nil) { providers, location in
-                    return drop(providers: providers)
+                .onDrop(of: ["public.image"], isTargeted: nil) { providers, location in
+                    return drop(providers: providers, at: location) //what for return bool?
                 }
         }
     }
     
-    private func drop(providers: [NSItemProvider])->Bool{//careful
-        let found = providers.loadFirstObject(ofType: URL.self) { url in//figure out extension
-            print("dropped url\(url)")
+    private func drop(providers: [NSItemProvider], at location: CGPoint) ->Bool {//careful
+        let isFounded = providers.loadFirstObject(ofType: URL.self){ url in
+            print(url)
             document.setBackground(url)
         }
-        return found
+        return isFounded
     }
     
     private let defaultEmojiSize: CGFloat = 50
